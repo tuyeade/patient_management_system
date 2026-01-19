@@ -1,1 +1,126 @@
-#include
+#include <iostream>
+#include <fstream>
+#include <cstring>
+using namespace std;
+
+// ---------------- STRUCTS ----------------
+struct Patient {
+    int id;
+    char name[50];
+    int age;
+    char gender[10];
+    char disease[50];
+};
+
+struct Routine {
+    int patientId;
+    char date[15];
+    float temperature;
+    char bp[15];
+    char medicine[50];
+    char notes[100];
+};
+
+// ---------------- FUNCTION DECLARATIONS ----------------
+bool login();
+void addPatient(Patient *p);
+void viewPatients();
+void searchPatient();
+void updatePatient();
+void deletePatient();
+
+void routineMenu();
+void addRoutine(Routine *r);
+void viewRoutine();
+
+// ---------------- MAIN ----------------
+int main() {
+
+    // ✅ LOGIN CHECK
+    if (!login()) {
+        cout << "Access denied. Program terminated.\n";
+        return 0;
+    }
+
+    int choice;
+    do {
+        cout << "\n===== PATIENT MANAGEMENT SYSTEM =====\n";
+        cout << "1. Add Patient\n";
+        cout << "2. View Patients\n";
+        cout << "3. Search Patient\n";
+        cout << "4. Update Patient\n";
+        cout << "5. Delete Patient\n";
+        cout << "6. Daily Routine Management\n";
+        cout << "7. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
+
+        switch (choice) {
+            case 1: {
+                Patient p;
+                addPatient(&p);
+                break;
+            }
+            case 2: viewPatients(); break;
+            case 3: searchPatient(); break;
+            case 4: updatePatient(); break;
+            case 5: deletePatient(); break;
+            case 6: routineMenu(); break;
+            case 7: cout << "Goodbye!\n"; break;
+            default: cout << "Invalid choice!\n";
+        }
+    } while (choice != 7);
+
+    return 0;
+}
+
+// ---------------- LOGIN FUNCTION ----------------
+bool login() {
+    char user[20], pass[20];
+    const char correctUser[] = "admin";
+    const char correctPass[] = "1234";
+
+    for (int i = 0; i < 3; i++) {
+        cout << "\nUsername: ";
+        cin >> user;
+        cout << "Password: ";
+        cin >> pass;
+
+        if (strcmp(user, correctUser) == 0 &&
+            strcmp(pass, correctPass) == 0) {
+            cout << "Login successful!\n";
+            return true;
+        } else {
+            cout << "Wrong credentials! Attempts left: "
+                 << 2 - i << endl;
+        }
+    }
+    return false;
+}
+
+// ---------------- ADD PATIENT ----------------
+void addPatient(Patient *p) {
+    ofstream file("patients.dat", ios::binary | ios::app);
+
+    cout << "Enter ID: ";
+    cin >> p->id;
+    cin.ignore();
+
+    cout << "Enter Name: ";
+    cin.getline(p->name, 50);
+
+    cout << "Enter Age: ";
+    cin >> p->age;
+
+    cout << "Enter Gender: ";
+    cin >> p->gender;
+    cin.ignore();
+
+    cout << "Enter Disease: ";
+    cin.getline(p->disease, 50);
+
+    file.write((char*)p, sizeof(*p));
+    file.close();
+
+    cout << "Patient added successfully!\n";
+}
